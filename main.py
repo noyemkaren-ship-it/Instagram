@@ -2,8 +2,8 @@ from fastapi import FastAPI, Request, Form, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-import crud_users
-import crud_images
+import CRUD_user
+import CRUD_image
 import os
 
 app = FastAPI()
