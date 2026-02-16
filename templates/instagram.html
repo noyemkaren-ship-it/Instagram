@@ -758,39 +758,39 @@
         });
     </script>
     <script>
-        // Получаем данные из базы (переданные из main.py)
+        <script>
         const girlsImages = [
             {% for img in girls_images %}
-            "{{ img.image }}",
+            "{{ img.url }}",
             {% endfor %}
         ];
 
         const memesImages = [
             {% for img in memes_images %}
-            "{{ img.image }}",
+            "{{ img.url }}",
             {% endfor %}
         ];
 
-        // Формируем каталоги
         const catalogs = [
             {
                 id: 'girls',
                 name: 'Девочки',
                 icon: '👧',
                 color: '#ff4d6d',
-                images: girlsImages.filter(url => url) // убираем пустые
+                images: girlsImages.filter(url => url && url.trim() !== '')
             },
             {
                 id: 'memes',
                 name: 'Мемы',
                 icon: '😂',
                 color: '#4ecdc4',
-                images: memesImages.filter(url => url)
+                images: memesImages.filter(url => url && url.trim() !== '')
             }
         ];
 
-        // Остальной код такой же...
-        // (весь твой старый JS код оставляем без изменений)
+        // ДАЛЬШЕ ТВОЙ СТАРЫЙ JS КОД...
+        // (весь остальной скрипт оставляем как есть)
     </script>
+
 </body>
 </html>
