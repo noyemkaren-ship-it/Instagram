@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram | Девочки и Мемы</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #000;
+            color: white;
+        }
+
+        /* Шапка как в Instagram */
+        .header {
+            background: #000;
+            border-bottom: 1px solid #262626;
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 935px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #ff4d6d, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Кнопки как в Instagram Stories */
+        .catalog-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .catalog-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #262626;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .catalog-btn.girls {
+            background: #ff4d6d;
+        }
+
+        .catalog-btn.memes {
+            background: #4ecdc4;
+        }
+
+        .catalog-btn.all {
+            background: #3b3b3b;
+        }
+
+        .catalog-btn.active {
+            border: 2px solid white;
+        }
+
+        .catalog-btn .count {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+
+        /* Instagram Stories-like stats */
+        .stories {
+            max-width: 935px;
+            margin: 16px auto;
+            padding: 0 16px;
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .stories::-webkit-scrollbar {
+            display: none;
+        }
+
+        .story-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            min-width: 64px;
+        }
+
+        .story-circle {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff4d6d, #4ecdc4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 2px solid #262626;
+        }
+
+        .story-label {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .story-value {
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Галерея как в Instagram */
+        .gallery {
+            max-width: 935px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3px;
+            padding: 0;
+            background: #000;
+        }
+
+        /* Карточка */
+        .gallery-item {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            cursor: pointer;
+            background: #1a1a1a;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.3s;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Бейдж как в Instagram (лайки) */
+        .badge {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            padding: 4px 8px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Модальное окно как в Instagram */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: block;
+        }
+
+        .modal-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 1001;
+            border-bottom: 1px solid #262626;
+        }
+
+        .modal-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff4d6d, #4ecdc4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .modal-username {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .modal-close {
+            font-size: 28px;
+            cursor: pointer;
+            color: white;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-image-container {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 0 100px;
+        }
+
+        .modal-image-container img {
+            max-width: 100%;
+            max-height: calc(100vh - 180px);
+            object-fit: contain;
+        }
+
+        .modal-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(10px);
+            padding: 12px 16px;
+            border-top: 1px solid #262626;
+            z-index: 1001;
+        }
+
+        .modal-stats {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 8px;
+        }
+
+        .modal-stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 14px;
+        }
+
+        .modal-nav {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .nav-btn {
+            background: #262626;
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: #3b3b3b;
+        }
+
+        .modal-counter {
+            margin-left: auto;
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Адаптивность как в Instagram */
+        @media (max-width: 735px) {
+            .gallery {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .catalog-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .story-circle {
+                width: 56px;
+                height: 56px;
+                font-size: 20px;
+            }
+        }
+
+        /* Лоадер для фото */
+        .image-loader {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1a1a1a;
+            color: #999;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">📸 Instagram</div>
+            <div class="catalog-buttons" id="catalog-buttons"></div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Stories с статистикой -->
+        <div class="stories" id="stories-container"></div>
+
+        <!-- Галерея -->
+        <div class="gallery" id="gallery-container"></div>
+
+        <!-- Модальное окно как в Instagram -->
+        <div class="modal" id="image-modal">
+            <div class="modal-header">
+                <div class="modal-user">
+                    <div class="modal-avatar" id="modal-avatar">👤</div>
+                    <div class="modal-username" id="modal-username">Загрузка...</div>
+                </div>
+                <div class="modal-close" onclick="closeModal()">✕</div>
+            </div>
+
+            <div class="modal-image-container">
+                <img id="modal-image" src="" alt="" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22 viewBox=%220 0 200 200%22><rect width=%22200%22 height=%22200%22 fill=%22%23333%22/><text x=%2250%22 y=%22115%22 font-size=%2220%22 fill=%22%23fff%22>⚠️</text></svg>'">
+            </div>
+
+            <div class="modal-footer">
+                <div class="modal-stats">
+                    <div class="modal-stat">
+                        <span>📸</span>
+                        <span id="modal-counter">1/28</span>
+                    </div>
+                    <div class="modal-stat">
+                        <span>🏷️</span>
+                        <span id="modal-catalog">Каталог</span>
+                    </div>
+                </div>
+
+                <div class="modal-nav">
+                    <button class="nav-btn" id="prev-btn" onclick="navigateModal(-1)">←</button>
+                    <button class="nav-btn" id="next-btn" onclick="navigateModal(1)">→</button>
+                    <span class="modal-counter" id="modal-position"></span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ВАШИ ФОТО ПО КАТАЛОГАМ (С НОВЫМИ ФОТО)
+        const catalogs = [
+            {
+                id: 'girls',
+                name: 'Девочки',
+                icon: '👧',
+                color: '#ff4d6d',
+                images: [
+                    "https://avatars.mds.yandex.net/i?id=683fb4d010ed7d35995eb28c79f1a372_l-4575625-images-thumbs&n=13",
+                    "https://i.pinimg.com/736x/f1/a9/b3/f1a9b33d70b95b7b888813e2ad0dd1a6.jpg",
+                    "https://i.pinimg.com/736x/ea/63/80/ea6380c15a9babc6aee5aff33559fcf6.jpg",
+                    "https://i.pinimg.com/736x/05/35/63/053563dcaffb06fd611c8e18e2681107.jpg",
+                    "https://i.pinimg.com/736x/e8/52/b6/e852b6f08a56ab47a259747f5e6c0264.jpg",
+                    "https://i.pinimg.com/736x/01/ce/c3/01cec3068989cf0b5b4fb068f38a4bb6.jpg",
+                    "https://i.pinimg.com/736x/57/e4/a8/57e4a849b50520891981febd59fa50f1.jpg",
+                    "https://i.pinimg.com/736x/a0/61/26/a06126795d8b3566936d7fe9c21d9812.jpg",
+                    "https://i.pinimg.com/736x/ec/b3/d7/ecb3d77ba9a16d0f316478999c446353.jpg",
+                    "https://i.pinimg.com/736x/96/eb/fc/96ebfc05ace9e27c685bbdedc8962800.jpg",
+                    "https://i.pinimg.com/736x/aa/d7/85/aad785deb7f19811864e5ca0d7322b2e.jpg",
+                    "https://i.pinimg.com/736x/53/ac/14/53ac140329c215c978a6df3e2365d43e.jpg",
+                    "https://i.pinimg.com/736x/9c/5f/2e/9c5f2efa4f9f9df06555760be148683b.jpg",
+                    "https://avatars.mds.yandex.net/i?id=e0f98d7b02ed84febf7a495cdeb72ec9_sr-10350577-images-thumbs&n=13",
+                    "https://i.pinimg.com/736x/32/45/0a/32450aeb668215e83df208b148b96196.jpg",
+                    "https://avatars.mds.yandex.net/i?id=f275b4bbb4b0e8b424a33db20b195222_l-5743679-images-thumbs&n=13",
+                    "https://avatars.mds.yandex.net/i?id=1980b3bc811d0b623f70a0865d3d25db_l-5217295-images-thumbs&n=13",
+                    "https://avatars.mds.yandex.net/i?id=0a7e14f26f2a12cbe077236f050f7e2a_l-5220482-images-thumbs&n=13",
+                    "https://p16-amd-va.tiktokcdn.com/tos-maliva-avt-0068/fc629a3d7e8390538718621b4cbca51d~tplv-tiktokx-cropcenter-q:720:720:q75.jpeg",
+                    "https://avatars.mds.yandex.net/i?id=ba138ed722f55e642cad073feefe0378_l-3644822-images-thumbs&n=13",
+                    "https://i.pinimg.com/736x/fd/10/c5/fd10c589cdf07c213ca0cd9f2a87b6b2.jpg",
+                    "https://i.pinimg.com/736x/e0/5f/a9/e05fa9e77ca43d50498f645b73f0e6b5.jpg",
+                    "https://i.pinimg.com/736x/90/ae/3f/90ae3f8957ea37ce2f07862789f4b5f3.jpg",
+                    "https://i.pinimg.com/736x/2d/0e/64/2d0e64000f23d17c7bf203689fe2191a.jpg",
+                    "https://i.pinimg.com/736x/0f/23/68/0f2368db66f24f0992a4c80411a0ee27.jpg",
+                    "https://i.pinimg.com/736x/cc/f6/11/ccf611c37a1cc6627a140de7f289d0e2.jpg",
+                    "https://i.pinimg.com/736x/3e/ab/87/3eab878fac18d35cb418f7891886850e.jpg",
+                    "https://i.pinimg.com/736x/76/ea/4d/76ea4d3dfcdd8bc4ac043d8396293ece.jpg",
+                    "https://i.pinimg.com/736x/73/96/e7/7396e7c162a78935fc6f6e86f9af01d2.jpg",
+                    "https://i.pinimg.com/736x/87/95/99/879599d8abfa64d02c238dc96f8cb994.jpg",
+                    "https://i.pinimg.com/736x/6e/ce/29/6ece29a272d4431c8732f7bfde01d376.jpg",
+                    "https://i.pinimg.com/736x/6d/ad/13/6dad13ee169c0e7c576c853c5fb729c2.jpg",
+                    "https://avatars.mds.yandex.net/i?id=820e285d841e321efdd933df55643e39c07ad26c-12753060-images-thumbs&n=13",
+                    "https://i.pinimg.com/1200x/8a/b2/26/8ab226ae6a7a3b43cfb588d2104a05ff.jpg",
+                    "https://i.pinimg.com/736x/41/96/69/419669821b27bb9baf310597897e25cf.jpg",
+                    "https://i.pinimg.com/736x/c3/97/9e/c3979e255b9cae3d050d83ed333e7392.jpg",
+                    "https://i.pinimg.com/474x/f8/4c/27/f84c27ccdf3b234866c6e0d429d84a4d.jpg",
+                    "https://i.pinimg.com/736x/90/76/9f/90769f3b7b9059c62626313e52a642b7.jpg",
+                    // НОВЫЕ ФОТО (11 штук)
+                    "https://i.pinimg.com/736x/de/f7/e0/def7e0cffdbefa9190486f38a31d46be.jpg",
+                    "https://i.pinimg.com/736x/80/67/3b/80673b65fc89b9bfb6bcbe5a6c60533c.jpg",
+                    "https://i.pinimg.com/736x/c9/5f/4c/c95f4cb5d9e9dc4ef935613cfd6d7791.jpg",
+                    "https://i.pinimg.com/736x/37/e3/2c/37e32ca39010efe5c1dda3e7e20c6971.jpg",
+                    "https://i.pinimg.com/736x/78/7d/58/787d5817ad2e9a4765e0eccc276ec8c7.jpg",
+                    "https://i.pinimg.com/736x/70/74/28/707428d9a72b74c935bfbe922e9e0ffa.jpg",
+                    "https://i.pinimg.com/736x/6c/65/05/6c6505245af307caa2f174f9c8c91337.jpg",
+                    "https://i.pinimg.com/736x/64/aa/70/64aa708dd22f354b5c5200ceab8bdd9c.jpg",
+                    "https://i.pinimg.com/736x/f9/29/4b/f9294bc43c358c7a4e9f888bfbacc67c.jpg",
+                    "https://i.pinimg.com/736x/a7/2a/e3/a72ae383133a5bb3e9348bbc7264b0e7.jpg",
+                    "https://i.pinimg.com/736x/d0/8b/87/d08b875dd64a7cc7dcad19f9a1b40f50.jpg"
+                ]
+            },
+            {
+                id: 'memes',
+                name: 'Мемы',
+                icon: '😂',
+                color: '#4ecdc4',
+                images: [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+
+                    "https://avatars.mds.yandex.net/i?id=9d38acbfd8b0ba3290190af5b17b2605_l-4881358-images-thumbs&n=13",
+                    "https://i.pinimg.com/736x/4b/7c/48/4b7c485dc75a7ea0162fed25296cc605.jpg",
+                    "https://i.pinimg.com/736x/d9/3d/b5/d93db54c17e8602aed3717e7caa253c9.jpg",
+                    "https://i.pinimg.com/736x/36/c8/39/36c839615879b4bfd7102abde3757040.jpg",
+                    "https://i.pinimg.com/736x/d3/2d/36/d32d3652b4194be31286c3d74d0c480f.jpg",
+                    "https://i.pinimg.com/736x/22/67/90/226790536f80a251975e4a912d65e57c.jpg",
+                    "https://i.pinimg.com/736x/87/9d/fc/879dfc50405f43210fc3deb00577f71c.jpg",
+                    "https://i.pinimg.com/736x/66/a0/2e/66a02e8c8bbbcb5deb0cdf3234acf5fb.jpg",
+                    "https://cs12.pikabu.ru/post_img/2022/04/30/5/og_og_165130227925225369.jpg",
+                    "https://avatars.mds.yandex.net/i?id=1b2fb158164ffc04f171238a4caf4c9b_l-3694967-images-thumbs&n=13",
+                    "https://i.pinimg.com/736x/b4/b0/58/b4b058b65c5306db01c1af2c85b94218.jpg",
+                    "https://i.pinimg.com/736x/b4/59/06/b45906095c458980db0030b8e74e73db.jpg",
+                    "https://i.pinimg.com/736x/5d/c1/13/5dc113b7c55150a2a3f0e028b4867863.jpg",
+                    "https://i.pinimg.com/736x/88/cb/70/88cb705f4be62ea9f45c60a2a5aa5be5.jpg",
+                    "https://i.pinimg.com/736x/7f/89/bb/7f89bb63fc0b1895ac2fcfa70a1dd784.jpg",
+                    "https://i.pinimg.com/736x/ef/30/fc/ef30fcdfd0b8049f749136efecfef971.jpg",
+                    "https://i.pinimg.com/736x/77/96/4b/77964b736f0e946913d431ebd521117a.jpg",
+                    "https://i.pinimg.com/736x/74/a1/f7/74a1f7751e8f70e1ce610b1115c70528.jpg",
+                    "https://i.pinimg.com/736x/49/55/46/4955463ec177f2089ea46f72feaa1adc.jpg",
+                    "https://i.pinimg.com/736x/de/a9/80/dea98065ac7e0ddd227d2f3e1f06b65d.jpg",
+                    // НОВЫЕ МЕМЫ (8 штук)
+                    "https://i.pinimg.com/736x/86/84/b1/8684b18cf28e6674878973a5d8759651.jpg",
+                    "https://i.pinimg.com/736x/e5/e6/30/e5e6304ca5243cf1d10c8435c8a2338a.jpg",
+                    "https://i.pinimg.com/736x/a4/1e/7a/a41e7ac88759d4312e412a703f3a53ee.jpg",
+                    "https://i.pinimg.com/736x/95/4a/c8/954ac871b00654687ceb89bbda24d9c7.jpg",
+                    "https://i.pinimg.com/736x/bb/ed/12/bbed122f11e6bb74df3515750623d009.jpg",
+                    "https://i.pinimg.com/736x/db/d6/5a/dbd65adc967fcd9abf72f02d87c9afbb.jpg",
+                    "https://i.pinimg.com/736x/09/6f/b5/096fb544f6b35d7b09eb3f6635e54f30.jpg",
+                    "https://i.pinimg.com/736x/18/10/3e/18103ec1d454948895402e68bd544e22.jpg",
+                    "https://avatars.mds.yandex.net/i?id=e02b94267b36ea79d19ba2f84c059ba8_l-6475641-images-thumbs&n=13",
+                    "https://ih1.redbubble.net/image.1738775445.8260/st,small,507x507-pad,600x600,f8f8f8.jpg",
+                    "https://avatars.mds.yandex.net/i?id=8eec77a3aed3f4b1212df219a8b7af75_l-5304692-images-thumbs&n=13",
+                    "https://i.pinimg.com/736x/d7/a4/c7/d7a4c7ecbdfe05a4a0a6699a0ddf46ee.jpg"
+                ]
+            }
+        ];
+
+        let currentImages = [];
+        let currentModalIndex = 0;
+        let currentFilter = 'all';
+
+        // Функция для перемешивания массива (РАНДОМ)
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Получить все фото и ПЕРЕМЕШАТЬ
+        function getAllImages() {
+            const all = [];
+            // Все фото девочек
+            catalogs[0].images.forEach((url, index) => {
+                all.push({
+                    url: url,
+                    catalog: catalogs[0].name,
+                    catalogId: catalogs[0].id,
+                    icon: catalogs[0].icon,
+                    order: `girls-${index}`
+                });
+            });
+            // Все фото мемов
+            catalogs[1].images.forEach((url, index) => {
+                all.push({
+                    url: url,
+                    catalog: catalogs[1].name,
+                    catalogId: catalogs[1].id,
+                    icon: catalogs[1].icon,
+                    order: `memes-${index}`
+                });
+            });
+            return shuffleArray(all); // ПЕРЕМЕШИВАЕМ ВСЕ ФОТО
+        }
+
+        // Кнопки каталогов
+        function renderButtons() {
+            const container = document.getElementById('catalog-buttons');
+            container.innerHTML = '';
+
+            // Все
+            const allBtn = document.createElement('button');
+            allBtn.className = `catalog-btn all ${currentFilter === 'all' ? 'active' : ''}`;
+            allBtn.innerHTML = `📸 Все <span class="count">${getAllImages().length}</span>`;
+            allBtn.onclick = () => filterCatalog('all');
+            container.appendChild(allBtn);
+
+            // Девочки
+            const girlsBtn = document.createElement('button');
+            girlsBtn.className = `catalog-btn girls ${currentFilter === 'girls' ? 'active' : ''}`;
+            girlsBtn.innerHTML = `👧 Девочки <span class="count">${catalogs[0].images.length}</span>`;
+            girlsBtn.onclick = () => filterCatalog('girls');
+            container.appendChild(girlsBtn);
+
+            // Мемы
+            const memesBtn = document.createElement('button');
+            memesBtn.className = `catalog-btn memes ${currentFilter === 'memes' ? 'active' : ''}`;
+            memesBtn.innerHTML = `😂 Мемы <span class="count">${catalogs[1].images.length}</span>`;
+            memesBtn.onclick = () => filterCatalog('memes');
+            container.appendChild(memesBtn);
+        }
+
+        // Stories статистика
+        function renderStories() {
+            const container = document.getElementById('stories-container');
+            const total = getAllImages().length;
+
+            container.innerHTML = `
+                <div class="story-item">
+                    <div class="story-circle">📸</div>
+                    <div class="story-label">Всего</div>
+                    <div class="story-value">${total}</div>
+                </div>
+                <div class="story-item">
+                    <div class="story-circle">👧</div>
+                    <div class="story-label">Девочки</div>
+                    <div class="story-value">${catalogs[0].images.length}</div>
+                </div>
+                <div class="story-item">
+                    <div class="story-circle">😂</div>
+                    <div class="story-label">Мемы</div>
+                    <div class="story-value">${catalogs[1].images.length}</div>
+                </div>
+            `;
+        }
+
+        // Фильтр
+        function filterCatalog(filter) {
+            currentFilter = filter;
+
+            if (filter === 'all') {
+                // Для раздела "Все" - ПЕРЕМЕШИВАЕМ все фото
+                currentImages = getAllImages();
+            } else {
+                const catalog = catalogs.find(c => c.id === filter);
+                // Для отдельных каталогов - ТОЖЕ ПЕРЕМЕШИВАЕМ
+                const catalogImages = catalog.images.map((url, index) => ({
+                    url: url,
+                    catalog: catalog.name,
+                    catalogId: catalog.id,
+                    icon: catalog.icon,
+                    order: `${catalog.id}-${index}`
+                }));
+                currentImages = shuffleArray(catalogImages); // ПЕРЕМЕШИВАЕМ ФОТО В КАТАЛОГЕ
+            }
+
+            renderGallery(currentImages);
+            renderButtons();
+            renderStories();
+        }
+
+        // Галерея
+        function renderGallery(images) {
+            const container = document.getElementById('gallery-container');
+            container.innerHTML = '';
+
+            images.forEach((img, index) => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+
+                const image = document.createElement('img');
+                image.src = img.url;
+                image.loading = 'lazy';
+                image.onclick = () => openModal(index);
+                image.onerror = function() {
+                    this.style.display = 'none';
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'image-loader';
+                    errorDiv.textContent = '❌';
+                    item.appendChild(errorDiv);
+                };
+
+                const badge = document.createElement('div');
+                badge.className = 'badge';
+                badge.textContent = img.icon;
+
+                item.appendChild(image);
+                item.appendChild(badge);
+                container.appendChild(item);
+            });
+        }
+
+        // Модалка
+        function openModal(index) {
+            currentModalIndex = index;
+            const modal = document.getElementById('image-modal');
+            const modalImg = document.getElementById('modal-image');
+            const modalUsername = document.getElementById('modal-username');
+            const modalCatalog = document.getElementById('modal-catalog');
+            const modalAvatar = document.getElementById('modal-avatar');
+            const counter = document.getElementById('modal-counter');
+            const position = document.getElementById('modal-position');
+
+            const currentImage = currentImages[index];
+
+            modalImg.src = currentImage.url;
+            modalUsername.textContent = currentImage.catalog;
+            modalCatalog.textContent = currentImage.catalog;
+            modalAvatar.textContent = currentImage.icon;
+            counter.textContent = `${index + 1}/${currentImages.length}`;
+            position.textContent = `${index + 1}/${currentImages.length}`;
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            updateNavButtons();
+        }
+
+        function closeModal() {
+            document.getElementById('image-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function navigateModal(direction) {
+            const newIndex = currentModalIndex + direction;
+            if (newIndex >= 0 && newIndex < currentImages.length) {
+                openModal(newIndex);
+            }
+        }
+
+        function updateNavButtons() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+
+            prevBtn.disabled = currentModalIndex === 0;
+            nextBtn.disabled = currentModalIndex === currentImages.length - 1;
+        }
+
+        // Клавиши
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+            if (e.key === 'ArrowLeft' && document.getElementById('image-modal').classList.contains('active')) {
+                navigateModal(-1);
+            }
+            if (e.key === 'ArrowRight' && document.getElementById('image-modal').classList.contains('active')) {
+                navigateModal(1);
+            }
+        });
+
+        // Свайпы для мобильных
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            if (!document.getElementById('image-modal').classList.contains('active')) return;
+
+            const touchEndX = e.changedTouches[0].screenX;
+            const diff = touchStartX - touchEndX;
+
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) {
+                    navigateModal(1);
+                } else {
+                    navigateModal(-1);
+                }
+            }
+        });
+
+        // Запуск
+        document.addEventListener('DOMContentLoaded', () => {
+            currentImages = getAllImages(); // Сразу перемешанные
+            renderButtons();
+            renderStories();
+            renderGallery(currentImages);
+        });
+    </script>
+    <script>
+        // Получаем данные из базы (переданные из main.py)
+        const girlsImages = [
+            {% for img in girls_images %}
+            "{{ img.image }}",
+            {% endfor %}
+        ];
+
+        const memesImages = [
+            {% for img in memes_images %}
+            "{{ img.image }}",
+            {% endfor %}
+        ];
+
+        // Формируем каталоги
+        const catalogs = [
+            {
+                id: 'girls',
+                name: 'Девочки',
+                icon: '👧',
+                color: '#ff4d6d',
+                images: girlsImages.filter(url => url) // убираем пустые
+            },
+            {
+                id: 'memes',
+                name: 'Мемы',
+                icon: '😂',
+                color: '#4ecdc4',
+                images: memesImages.filter(url => url)
+            }
+        ];
+
+        // Остальной код такой же...
+        // (весь твой старый JS код оставляем без изменений)
+    </script>
+</body>
+</html>
