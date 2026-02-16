@@ -33,7 +33,7 @@ async def register_user(
 ):
     """Обработка регистрации"""
     # Проверяем, есть ли уже такой пользователь
-    existing_user = crud_users.get_user_by_name(name)
+    existing_user = CRUD_user.get_user_by_name(name)
     if existing_user:
         return templates.TemplateResponse(
             "register.html",
@@ -41,13 +41,13 @@ async def register_user(
         )
 
     # Получаем следующий ID
-    all_users = crud_users.get_all_users()
+    all_users = CRUD_user.get_all_users()
     new_id = 1
     if all_users:
         new_id = max(user['id'] for user in all_users) + 1
 
     # Добавляем пользователя
-    crud_users.add_user(new_id, name, password)
+    CRUD_user.add_user(new_id, name, password)
 
     # Перенаправляем на логин
     return RedirectResponse(url="/login", status_code=303)
@@ -69,7 +69,7 @@ async def login_user(
         password: str = Form(...)
 ):
     """Обработка входа"""
-    if crud_users.check_user(name, password):
+    if CRUD_user.check_user(name, password):
         # Успешный вход - перенаправляем в Instagram
         return RedirectResponse(url="/instagram", status_code=303)
     else:
@@ -84,7 +84,7 @@ async def login_user(
 async def instagram_page(request: Request):
     """Главная страница с фото"""
     # Получаем все изображения из базы
-    all_images = crud_images.get_all_images()
+    all_images = CRUD_image.get_all_images()
 
     # Разделяем по категориям
     girls_images = [img for img in all_images if img['category'] == 1]
@@ -119,11 +119,11 @@ async def add_test_photos():
 
     for i, url in enumerate(girls_photos):
         img_id = i + 1
-        crud_images.add_image(img_id, url, 1)
+        CRUD_image.add_image(img_id, url, 1)
 
     for i, url in enumerate(memes_photos):
         img_id = i + 100
-        crud_images.add_image(img_id, url, 2)
+        CRUD_image.add_image(img_id, url, 2)
 
     return {"message": f"Добавлено {len(girls_photos)} фото девочек и {len(memes_photos)} мемов"}
 
