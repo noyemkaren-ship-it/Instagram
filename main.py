@@ -9,12 +9,9 @@ import os
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
-# Создаем папку для статических файлов если нет
 os.makedirs("static", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-
-# ========== СТРАНИЦЫ ==========
 
 @app.get("/")
 async def register_page(request: Request):
@@ -31,8 +28,6 @@ async def register_user(
         name: str = Form(...),
         password: str = Form(...)
 ):
-    """Обработка регистрации"""
-    # Проверяем, есть ли уже такой пользователь
     existing_user = CRUD_user.get_user_by_name(name)
     if existing_user:
         return templates.TemplateResponse(
